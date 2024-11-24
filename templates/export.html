@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exportar HTML dos Projetos GitHub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/export.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Código HTML dos Projetos GitHub</h1>
+        
+        <div class="success-message" id="copySuccess">
+            HTML copiado para a área de transferência! 🎉
+        </div>
+        
+        <div class="button-group">
+            <a href="{{ url_for('index') }}">
+                <button class="back-btn">← Voltar</button>
+            </a>
+            <button class="copy-btn" onclick="copyToClipboard()">
+                Copiar HTML
+            </button>
+        </div>
+        
+        <pre><code id="htmlCode">{{ cards_html }}</code></pre>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/export.js') }}"></script>
+</body>
+</html>

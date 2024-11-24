@@ -1,0 +1,112 @@
+/* Estilos específicos para a página de exportação */
+pre {
+    background: rgba(17, 17, 17, 0.7);
+    padding: 20px;
+    border-radius: 16px;
+    overflow-x: auto;
+    margin-top: 20px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    border: 1px solid rgba(51, 51, 51, 0.3);
+    color: #F6F6F6;
+    font-family: 'Fira Code', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+code {
+    color: #22D4FD;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.back-btn {
+    background: rgba(35, 192, 228, 0.1);
+    border: 1px solid #23C0E4;
+    color: #23C0E4;
+}
+
+.back-btn:hover {
+    background: #23C0E4;
+    color: #111;
+}
+
+.copy-btn {
+    background: #23C0E4;
+    color: #111;
+}
+
+.copy-btn:hover {
+    background: #22D4FD;
+}
+
+.success-message {
+    display: none;
+    background: rgba(40, 167, 69, 0.1);
+    border: 1px solid #28a745;
+    color: #28a745;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin: 10px 0;
+    font-weight: 500;
+    animation: fadeOut 3s forwards;
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    70% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* Estilizando a barra de rolagem */
+pre::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+pre::-webkit-scrollbar-track {
+    background: rgba(17, 17, 17, 0.7);
+    border-radius: 8px;
+}
+
+pre::-webkit-scrollbar-thumb {
+    background: #23C0E4;
+    border-radius: 8px;
+}
+
+pre::-webkit-scrollbar-thumb:hover {
+    background: #22D4FD;
+}
+
+/* Highlight de sintaxe */
+.html-tag { 
+    color: #22D4FD; 
+}
+
+.html-attr { 
+    color: #23C0E4; 
+}
+
+.html-string { 
+    color: #28a745; 
+}
+
+.html-comment { 
+    color: #6c757d; 
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .button-group {
+        flex-direction: column;
+    }
+
+    pre {
+        font-size: 12px;
+        padding: 15px;
+    }
+}

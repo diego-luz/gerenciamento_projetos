@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Projetos GitHub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+     <!-- Login e Logout -->
+    <div class="user-info">
+        <span>Olá, {{ current_user.username }}!</span>
+        {% if current_user.is_admin %}
+            <span class="admin-badge">Admin</span>
+        {% endif %}
+        <a href="{{ url_for('logout') }}" class="logout-btn">Sair</a>
+    </div>
+
+    <div class="container">
+        <h1>Gerenciador de Projetos GitHub</h1>
+        
+        <!-- Lista de categorias existentes -->
+        <div class="categories-list">
+            <h3>Categorias Existentes:</h3>
+            {% for category in categories %}
+                <span class="category-tag">{{ category }}</span>
+            {% endfor %}
+        </div>
+        
+        <!-- Formulário de adição -->
+        <form method="POST" action="{{ url_for('create_card') }}" id="addForm">
+            <div class="form-group">
+                <label for="title">Título:</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+
+            <div class="form-group">
+                <label for="category">Categoria:</label>
+                <div class="datalist-input">
+                    <input 
+                        type="text" 
+                        id="categoryInput" 
+                        name="category" 
+                        list="categories" 
+                        placeholder="Digite ou selecione uma categoria existente"
+                        required
+                    >
+                    <datalist id="categories">
+                        {% for category in categories %}
+                            <option value="{{ category }}">
+                        {% endfor %}
+                    </datalist>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Descrição:</label>
+                <textarea id="description" name="description" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="image_url">URL da Imagem:</label>
+                <input type="url" id="image_url" name="image_url" required onchange="previewImage(this.value)">
+                <img id="imagePreview" class="image-preview" src="" alt="Preview da imagem">
+            </div>
+
+            <div class="form-group">
+                <label for="link">Link do Projeto:</label>
+                <input type="url" id="link" name="link" required>
+            </div>
+
+            <button type="submit">Adicionar Card</button>
+        </form>
+
+        <!-- Botões de ação -->
+        <div class="action-buttons">
+            <button class="select-all-btn" onclick="toggleSelectAll()">Selecionar Todos</button>
+            <button class="export-selected-btn" onclick="exportSelected()">Exportar Selecionados</button>
+            <button class="export-all-btn" onclick="exportAll()">Exportar Todos</button>
+        </div>
+
+        <!-- Lista de cards -->
+        <div class="card-preview">
+            {% for card in cards %}
+            <div class="card" data-id="{{ card[0] }}">
+                <div class="card-number">#{{ loop.index }}</div>
+                <input type="checkbox" class="card-checkbox" value="{{ card[0] }}">
+                <div class="card-actions">
+                    <button class="edit-btn" onclick="openEditModal('{{ card[0] }}', '{{ card[1] }}', '{{ card[2] }}', '{{ card[3] }}', '{{ card[4] }}', '{{ card[5] }}')" title="Editar">
+                        ✎
+                    </button>
+                    <button class="delete-btn" onclick="deleteCard('{{ card[0] }}')" title="Excluir">
+                        ×
+                    </button>
+                </div>
+                <img src="{{ card[4] }}" alt="{{ card[1] }}">
+                <span class="category">{{ card[2] }}</span>
+                <h3>{{ card[1] }}</h3>
+                <p>{{ card[3] }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Modal de Edição -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeEditModal()">&times;</span>
+            <h2>Editar Card</h2>
+            <form id="editForm">
+                <input type="hidden" id="editCardId" name="id">
+                
+                <div class="form-group">
+                    <label for="editTitle">Título:</label>
+                    <input type="text" id="editTitle" name="title" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editCategory">Categoria:</label>
+                    <input 
+                        type="text" 
+                        id="editCategory" 
+                        name="category" 
+                        list="categories" 
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="editDescription">Descrição:</label>
+                    <textarea id="editDescription" name="description" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="editImageUrl">URL da Imagem:</label>
+                    <input type="url" id="editImageUrl" name="image_url" required onchange="previewEditImage(this.value)">
+                    <img id="editImagePreview" class="image-preview" src="" alt="Preview da imagem">
+                </div>
+
+                <div class="form-group">
+                    <label for="editLink">Link do Projeto:</label>
+                    <input type="url" id="editLink" name="link" required>
+                </div>
+
+                <button type="button" onclick="submitEditForm()">Salvar Alterações</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Script para manipulação do DOM -->
+    <script>
+        // Função para escapar caracteres especiais em strings
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Função para abrir o modal de edição com os dados do card
+        function openEditModal(id, title, category, description, imageUrl, link) {
+            document.getElementById('editCardId').value = id;
+            document.getElementById('editTitle').value = decodeURIComponent(title);
+            document.getElementById('editCategory').value = decodeURIComponent(category);
+            document.getElementById('editDescription').value = decodeURIComponent(description);
+            document.getElementById('editImageUrl').value = decodeURIComponent(imageUrl);
+            document.getElementById('editLink').value = decodeURIComponent(link);
+            previewEditImage(decodeURIComponent(imageUrl));
+            
+            document.getElementById('editModal').style.display = 'block';
+        }
+    </script>
+
+    <!-- Importação do JavaScript principal -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
